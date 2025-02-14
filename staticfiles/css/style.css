@@ -1,0 +1,38 @@
+/* Basic styles */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+nav {
+    background-color: #333;
+    padding: 1rem;
+}
+
+.nav-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.brand-logo {
+    color: white;
+    text-decoration: none;
+    font-size: 1.5rem;
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}

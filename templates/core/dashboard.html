@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Pulse AI Dashboard - Analytics and Insights">
+    <title>Pulse Ai</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'electrocardiogram.png' %}">
+    <!-- Preload critical assets -->
+    <link rel="preload" href="{% static 'css/dash.css' %}" as="style">
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <!-- Critical CSS -->
+    <link rel="stylesheet" href="{% static 'css/dash.css' %}">
+
+    <!-- Performance optimizations -->
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://code.jquery.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://code.jquery.com" crossorigin>
+    
+    <!-- Async load non-critical CSS -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    </noscript>
+</head>
+
+<body>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="fas fa-sun"></i>
+    </button>
+
+    <div class="header-container">
+        <h1>Pulse</h1>
+        <div class="logo">
+            <img src="{% static 'electrocardiogram.png' %}" alt="Pulse AI Logo" loading="lazy">
+        </div>
+        <h1>Ai</h1>
+    </div>
+    <div class="card-container">
+        {% for key, value in cards.items %}
+        <div class="card" data-key="{{ key }}">
+            <h2>{{ value }}</h2>
+            <p>{{ key }}</p>
+        </div>
+        {% endfor %}
+        {% if graphs.churned_customers and graphs.churned_customers.churned_counts %}
+        <div class="card">
+            <h2>{{ graphs.churned_customers.churned_counts.True|default:"0" }}/{{ graphs.churned_customers.churned_counts.False|default:"0" }}</h2>
+            <p>Churned Clients</p>
+        </div>
+        {% else %}
+        <div class="card">
+            <h2>0/0</h2>
+            <p>Churned Clients</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="filters">
+        <button id="toggleFilters" class="toggle-filters">
+            <i class="fas fa-filter"></i>
+        </button>
+
+        <div class="filter-content">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <i class="fas fa-tags"></i>
+                    <select id="categoryFilter" title="Category">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category }}">{{ category }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <select id="locationFilter" title="Location">
+                        <option value="">All Locations</option>
+                        {% for location in locations %}
+                        <option value="{{ location }}">{{ location }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <i class="fas fa-user"></i>
+                    <div id="ageSlider" class="slider-input"></div>
+                    <span id="ageRange" class="range-label"></span>
+                </div>
+
+                <div class="filter-group">
+                    <i class="fas fa-star"></i>
+                    <div id="ratingSlider" class="slider-input"></div>
+                    <span id="ratingRange" class="range-label"></span>
+                </div>
+
+                <div class="filter-group date-group">
+                    <i class="fas fa-calendar"></i>
+                    <div class="date-inputs">
+                        <select id="startDateFilter" title="Start Date">
+                            <option value="">Start</option>
+                            {% for date in graphs.available_dates %}
+                            <option value="{{ date }}">{{ date }}</option>
+                            {% endfor %}
+                        </select>
+                        <select id="endDateFilter" title="End Date">
+                            <option value="">End</option>
+                            {% for date in graphs.available_dates %}
+                            <option value="{{ date }}">{{ date }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <button id="applyFilter" class="action-btn primary"><i class="fas fa-check"></i></button>
+                <button id="resetFilter" class="action-btn"><i class="fas fa-undo"></i></button>
+                <button id="generateReport" class="action-btn"><i class="fas fa-file-export"></i></button>
+
+            </div>
+        </div>
+
+        <div id="loader" class="loader">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="text-align-center">
+        <h1>Sales Analysis</h1>
+    </div>
+    <div class="charts" role="region" aria-label="Dashboard Charts">
+
+
+        <div class="chart-container">
+            <div class="chart-header">
+                <h2>Sales by Location</h2>
+                <div class="help-icon">?
+                    <span class="help-tooltip">Geographic distribution of sales, highlighting performance across
+                        different store locations.</span>
+                </div>
+            </div>
+            <canvas id="locationChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-header">
+                <h2>Sales by Season</h2>
+                <div class="help-icon">?
+                    <span class="help-tooltip">Shows sales performance across different seasons, helping identify
+                        seasonal trends.</span>
+                </div>
+            </div>
+            <canvas id="seasonChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-header">
+                <h2>Sales by Category</h2>
+                <div class="help-icon">?
+                    <span class="help-tooltip">Displays sales distribution across product categories, highlighting top
+                        performing categories.</span>
+                </div>
+            </div>
+            <canvas id="categoryChart"></canvas>
+        </div>
+
+    <div class="chart-container">
+        <div class="chart-header">
+            <div class="chart-header-controls">
+                <h2>Sales Trends</h2>
+                <select id="salesTrendPeriod">
+                    <option value="month">By Month</option>
+                    <option value="year">By Year</option>
+                </select>
+            </div>
+            <div class="help-icon">?
+                <span class="help-tooltip" id="salesTrendTooltip">Monthly sales trends, showing how sales fluctuate
+                    over the course of a year.</span>
+            </div>
+        </div>
+        <canvas id="salesTrendChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <div class="chart-header">
+            <h2>Sales by Day</h2>
+            <div class="help-icon">?
+                <span class="help-tooltip">Shows daily sales patterns with average and total sales per day of the
+                    week.</span>
+            </div>
+        </div>
+        <canvas id="salesByDayChart"></canvas>
+    </div>
+    <div class="text-align-center">
+        <h1>Store and Region Insights</h1>
+    </div>
+
+    <div class="chart-container table-container">
+        <h2>Store Sales Details</h2>
+        <div class="store-sales-table-container">
+            <div class="sort-control">
+                <label for="salesSort">Sort by Sales:</label>
+                <select id="salesSort">
+                    <option value="desc">Highest to Lowest</option>
+                    <option value="asc">Lowest to Highest</option>
+                </select>
+            </div>
+            <div class="table-wrapper">
+                <table id="storeSalesTable" class="store-sales-table">
+                    <thead>
+                        <tr>
+                            <th>Store Name</th>
+                            <th>Sales (USD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-header">
+            <h2>Sales by Region</h2>
+            <div class="help-icon">?
+                <span class="help-tooltip">Sales performance across different regions, helping identify regional
+                    strengths and weaknesses.</span>
+            </div>
+        </div>
+        <canvas id="regionChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <div class="chart-header">
+            <h2>Sales by Store Size</h2>
+            <div class="help-icon">?
+                <span class="help-tooltip">Sales performance based on store size, helping identify the impact of
+                    store size on sales.</span>
+            </div>
+        </div>
+        <canvas id="storeSizeChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <div class="chart-header">
+            <h2>Top Selling Products</h2>
+            <div class="help-icon">?
+                <span class="help-tooltip">Highlights the top-selling products, helping identify the most popular
+                    items.</span>
+            </div>
+        </div>
+        <canvas id="topSellingProductsChart"></canvas>
+    </div>
+    <!-- Add canvas elements for the new charts -->
+    <div class="chart-container">
+        <div class="chart-header">
+            <h2>Cross-Sell & Upsell Opportunities</h2>
+            <div class="help-icon">?
+                <span class="help-tooltip">Identifies opportunities for cross-selling and upselling, helping
+                    increase sales through related products.</span>
+            </div>
+        </div>
+        <canvas id="crossSellUpsellChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <div class="chart-header">
+            <h2>CLV Distribution</h2>
+            <div class="help-icon">?
+                <span class="help-tooltip">Customer Lifetime Value distribution, showing the expected revenue from
+                    different customer segments.</span>
+            </div>
+        </div>
+        <canvas id="clvDistributionChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <div class="chart-header">
+            <h2>Discount Impact</h2>
+            <div class="help-icon">?
+                <span class="help-tooltip">Analyzes the impact of discounts on sales, helping understand the
+                    effectiveness of discount strategies.</span>
+            </div>
+        </div>
+        <canvas id="discountImpactChart"></canvas>
+    </div>
+    <div class="text-align-center">
+        <h1>Customer Insights</h1>
+    </div>
+    <div class="chart-container">
+        <div class="chart-header">
+            <h2>Age Distribution</h2>
+            <div class="help-icon">?
+                <span class="help-tooltip">Shows the age distribution of customers, helping understand the age
+                    demographics of the customer base.</span>
+            </div>
+        </div>
+        <canvas id="ageChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <div class="chart-header">
+            <h2>Gender Distribution</h2>
+            <div class="help-icon">?
+                <span class="help-tooltip">Shows the gender distribution of customers, helping understand the gender
+                    demographics of the customer base.</span>
+            </div>
+        </div>
+        <canvas id="genderChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <div class="chart-header">
+            <h2>Sales by Age Bins</h2>
+            <div class="help-icon">?
+                <span class="help-tooltip">Sales performance across different age groups, helping identify age
+                    segments with the highest sales.</span>
+            </div>
+        </div>
+        <canvas id="ageBinsChart"></canvas>
+    </div>
+
+    <!-- Update the churned customers section -->
+    <div class="chart-container table-container">
+        <h2>List of Churned Customers</h2>
+        <button id="downloadChurnedReport" class="action-button">Download Churned Report</button>
+        <div class="store-sales-table-container">
+            <div class="table-wrapper">
+                <table id="churnedCustomersTable" class="store-sales-table">
+                    <thead>
+                        <tr>
+                            <th>Churned Customer ID</th>
+                            <th>Location</th>
+                            <th>Region</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in graphs.churned_customers.churned_customers.zipped_data %}
+                        <tr>
+                            <td>{{ data.0 }}</td>
+                            <td>{{ data.1 }}</td>
+                            <td>{{ data.2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-align-center">
+        <h1>Discounts and Promotions</h1>
+    </div>
+    <div class="chart-container">
+        <div class="chart-header">
+            <h2>Peak Purchase Hours</h2>
+            <div class="help-icon">?
+                <span class="help-tooltip">Identifies the hours of the day with the highest purchase activity,
+                    helping optimize store operations and staffing.</span>
+            </div>
+        </div>
+        <canvas id="peakHoursChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <div class="chart-header">
+            <h2>Promo Code Usage</h2>
+            <div class="help-icon">?
+                <span class="help-tooltip">Analyzes the usage of promo codes, helping understand the effectiveness
+                    of promotional campaigns.</span>
+            </div>
+        </div>
+        <canvas id="promoCodeChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <div class="chart-header">
+            <h2>Discount Histogram</h2>
+            <div class="help-icon">?
+                <span class="help-tooltip">Shows the distribution of discounts applied, helping understand the range
+                    and frequency of discounts.</span>
+            </div>
+        </div>
+        <canvas id="discountHistogramChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <div class="chart-header">
+            <h2>RFM Segments</h2>
+            <div class="help-icon">?
+                <span class="help-tooltip">Recency, Frequency, and Monetary (RFM) segments, helping identify
+                    customer segments based on their purchase behavior.</span>
+            </div>
+        </div>
+        <canvas id="rfmSegmentsChart"></canvas>
+    </div>
+    <div class="chart-container full-width-chart">
+        <div class="chart-header">
+            <h2>Visit vs Purchase Frequency</h2>
+            <div class="help-icon">?
+                <span class="help-tooltip">Analyzes the relationship between visit frequency and purchase frequency,
+                    helping understand customer engagement.</span>
+            </div>
+        </div>
+        <canvas id="visitVsPurchaseFrequencyChart"></canvas>
+    </div>
+    <div class="text-align-center">
+        <h1>Predictions</h1>
+    </div>
+    <div class="mchart-container">
+        <div class="chart-header">
+            <h2>Predicted Monthly Sales</h2>
+            <div class="help-icon">?
+                <span class="help-tooltip">Forecasts monthly sales based on historical data, helping plan for future
+                    sales performance.</span>
+            </div>
+        </div>
+        <canvas id="predictedSalesChart"></canvas>
+    </div>
+    </div>
+    <input type="hidden" id="graphImages" name="graphImages">
+
+    <!-- Initial data container -->
+    <script id="initial-data" type="application/json">
+        {{ data_json|safe }}
+    </script>
+
+    <!-- External Scripts -->
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script defer src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script defer src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script defer src="{% static 'js/dashboard.js' %}"></script>
+
+    <!-- CSRF Token for AJAX requests -->
+    <script>
+        const CSRF_TOKEN = '{{ csrf_token }}';
+        // Add CSRF token to all AJAX requests
+        $.ajaxSetup({
+            headers: {
+                'X-CSRFToken': CSRF_TOKEN
+            }
+        });
+    </script>
+
+    <!-- Add theme toggle script before closing body tag -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggle = document.getElementById('themeToggle');
+            const html = document.documentElement;
+            const icon = themeToggle.querySelector('i');
+
+            // Prevent flash of wrong theme
+            document.documentElement.style.visibility = 'hidden';
+
+            // Check system preference and saved theme
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const savedTheme = localStorage.getItem('theme');
+            const initialTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+
+            // Apply initial theme without transition
+            html.classList.add('no-transitions');
+            html.setAttribute('data-theme', initialTheme);
+            updateIcon(initialTheme);
+
+            // Enable transitions after initial theme is set
+            requestAnimationFrame(() => {
+                html.classList.remove('no-transitions');
+                document.documentElement.style.visibility = '';
+            });
+
+            // Listen for system theme changes
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(e => {
+                if (!localStorage.getItem('theme')) {
+                    const newTheme = e.matches ? 'dark' : 'light';
+                    html.setAttribute('data-theme', newTheme);
+                    updateIcon(newTheme);
+                }
+            });
+
+            // Theme toggle with debounce
+            let timeout;
+            themeToggle.addEventListener('click', () => {
+                if (timeout) clearTimeout(timeout);
+
+                timeout = setTimeout(() => {
+                    const currentTheme = html.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+                    html.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                    updateIcon(newTheme);
+
+                    // Update chart colors if needed
+                    if (window.updateChartTheme) {
+                        window.updateChartTheme(newTheme);
+                    }
+                }, 50);
+            });
+
+            function updateIcon(theme) {
+                icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            }
+        });
+    </script>
+
+</body>
+
+</html>

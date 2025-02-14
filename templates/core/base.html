@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Pulse AI{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav-wrapper">
+                <a href="{% url 'core:index' %}" class="brand-logo">Pulse AI</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        {% csrf_token %} 
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Pulse AI</p>
+    </footer>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

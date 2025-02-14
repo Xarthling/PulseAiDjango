@@ -1,0 +1,1179 @@
+:root {
+    /* Common variables */
+    --transition-speed: 0.3s;
+    --border-radius: 4px;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 2rem;
+    --spacing-xlg: 4rem;
+
+
+    /* Dark theme (default) */
+    --primary-hue: 174;
+    --accent-hue: 302;
+    
+    --primary: hsl(var(--primary-hue), 97%, 43%);
+    --primary-dark: hsl(var(--primary-hue), 97%, 27%);
+    --primary-light: hsl(var(--primary-hue), 97%, 53%);
+    
+    --accent: hsl(var(--accent-hue), 98%, 51%);
+    --accent-transparent: hsla(var(--accent-hue), 98%, 51%, 0.16);
+    
+    --background: hsl(0, 0%, 7%);
+    --surface: hsl(0, 0%, 12%);
+    --surface-transparent: hsla(0, 0%, 12%, 0.8);
+    
+    --text: hsl(0, 0%, 88%);
+    --text-secondary: hsl(0, 0%, 60%);
+    
+    --border: hsla(0, 0%, 100%, 0.1);
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    
+    --card-bg: hsla(0, 0%, 12%, 0.2);
+    --tooltip-bg: hsla(0, 0%, 0%, 0.85);
+    --chart-container-bg: hsla(0, 0%, 12%, 0.2);
+
+    --card-text: #FFFFFF;
+    --heading-color: #FFFFFF;
+    --table-header-bg: hsla(0, 0%, 12%, 0.95);
+    --table-row-even: hsla(0, 0%, 17%, 0.7);
+    --table-row-hover: hsla(var(--accent-hue), 98%, 51%, 0.1);
+    --table-border: hsla(0, 0%, 100%, 0.1);
+
+    /* Add filter-specific theme variables */
+    --filter-bg: hsla(0, 0%, 12%, 0.8);
+    --filter-border: hsla(0, 0%, 100%, 0.1);
+    --filter-input-bg: hsla(0, 0%, 100%, 0.1);
+    --filter-input-border: hsla(0, 0%, 100%, 0.2);
+    --filter-hover-bg: hsla(var(--primary-hue), 97%, 43%, 0.1);
+    --slider-bg: hsla(0, 0%, 100%, 0.1);
+    --slider-handle-bg: var(--primary);
+    --range-label-bg: hsla(var(--primary-hue), 97%, 43%, 0.1);
+    --range-label-border: hsla(var(--primary-hue), 97%, 43%, 0.2);
+}
+
+[data-theme="light"] {
+    /* Light theme overrides */
+    --primary: hsl(var(--primary-hue), 97%, 27%);
+    --primary-dark: hsl(var(--primary-hue), 97%, 17%);
+    --primary-light: hsl(var(--primary-hue), 97%, 37%);
+    
+    --accent: hsl(var(--accent-hue), 98%, 41%);
+    --accent-transparent: hsla(var(--accent-hue), 98%, 41%, 0.16);
+    
+    --background: hsl(0, 0%, 96%);
+    --surface: hsl(0, 0%, 100%);
+    --surface-transparent: hsla(0, 0%, 100%, 0.8);
+    
+    --text: hsl(0, 0%, 20%);
+    --text-secondary: hsl(0, 0%, 40%);
+    
+    --border: hsla(0, 0%, 0%, 0.1);
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    
+    --card-bg: hsla(0, 0%, 100%, 0.9);
+    --tooltip-bg: hsla(0, 0%, 100%, 0.95);
+    --chart-container-bg: hsla(0, 0%, 100%, 0.9);
+
+    --card-text: var(--text);
+    --heading-color: var(--text);
+    --table-header-bg: hsla(0, 0%, 100%, 0.95);
+    --table-row-even: hsla(0, 0%, 97%, 0.7);
+    --table-row-hover: hsla(var(--accent-hue), 98%, 51%, 0.05);
+    --table-border: hsla(0, 0%, 0%, 0.1);
+
+    /* Filter overrides for light theme */
+    --filter-bg: hsla(0, 0%, 100%, 0.8);
+    --filter-border: hsla(0, 0%, 0%, 0.1);
+    --filter-input-bg: hsla(0, 0%, 0%, 0.05);
+    --filter-input-border: hsla(0, 0%, 0%, 0.1);
+    --filter-hover-bg: hsla(var(--primary-hue), 97%, 43%, 0.05);
+    --slider-bg: hsla(0, 0%, 0%, 0.1);
+    --slider-handle-bg: var(--primary);
+    --range-label-bg: hsla(var(--primary-hue), 97%, 43%, 0.05);
+    --range-label-border: hsla(var(--primary-hue), 97%, 43%, 0.1);
+    --chart-text-color: #333333;  /* Add this new variable */
+}
+
+/* Optimize theme transitions */
+*, *::before, *::after {
+    transition: background-color var(--transition-speed) ease,
+                color var(--transition-speed) ease,
+                border-color var(--transition-speed) ease,
+                box-shadow var(--transition-speed) ease;
+}
+
+/* Remove transitions for performance */
+.chart-container, .card, .filters {
+    transition: none;
+}
+
+.theme-toggle {
+    position: fixed;
+    bottom: 20px;  /* Changed from bottom to top */
+    right: 20px;
+    z-index: 1002;
+    background: #00B9B3;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    background: var(--primary-light);
+}
+
+.theme-toggle:active {
+    transform: scale(0.95);
+}
+
+.theme-toggle i {
+    color: var(--background);
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+[data-theme="light"] .theme-toggle i {
+    transform: rotate(360deg);
+}
+
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    /* background-image: url('../840843081452.jpg'); */
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: var(--background);
+    color: var(--text);
+    overflow-x: hidden;
+}
+
+h1, h2 {
+    width: 100%;
+    text-align: center;
+    color: var(--heading-color);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: color var(--transition-speed) ease;
+}
+
+h1 {
+    position: relative;  /* Add position relative */
+    /* padding-right: 60px;  */
+}
+
+.text-align-center {
+    text-align: center;
+    margin: 20px 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.charts h1 {
+    position: relative;
+    width: 100%;
+    text-align: center;
+    margin: 30px 0;
+    padding-top: 20px;  /* Add padding top for spacing */
+    padding-bottom: 10px;  /* Add padding bottom for spacing */
+}
+
+a {
+    text-decoration: none;
+    color: var(--primary); /* Secondary */
+}
+
+/* Header Styles */
+.header-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.header-container .logo img {
+    width: 8vw;
+}
+
+.header-container h1 {
+    width: auto;
+    margin: 0;
+    color: var(--primary); /* Secondary */
+}
+
+/* Filters Section */
+.filters {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--filter-bg);
+    border-bottom: 1px solid var(--filter-border);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    min-height: 3rem; 
+}
+
+.filter-content {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+}
+
+.filters.expanded .filter-content {
+    max-height: 500px;
+    opacity: 1;
+    padding: .5rem 0;
+}
+
+.toggle-filters {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--filter-input-bg);
+    border: 1px solid var(--filter-input-border);
+    color: var(--primary);
+    cursor: pointer;
+    padding: 0.7rem;
+    font-size: 1rem;
+    z-index: 1001;
+    border-radius: 50%;
+    backdrop-filter: blur(4px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-filters i {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle-filters:hover {
+    background: var(--filter-hover-bg);
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(3, 218, 198, 0.3);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.toggle-filters:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.filters.expanded .toggle-filters i {
+    transform: rotate(180deg);
+}
+
+.filters.expanded .toggle-filters {
+    background: var(--filter-hover-bg);
+    border-color: var(--primary);
+}
+
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    padding: .5rem 1rem;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 150px;
+}
+
+.filter-group i {
+    color: var(--primary);
+    width: 1rem;
+    text-align: center;
+}
+
+.filter-group select,
+.slider-input {
+    background: var(--filter-input-bg);
+    border: 1px solid var(--filter-input-border);
+    color: #fff;
+    /* padding: 0.3rem 0.5rem; */
+    font-size: 0.6rem;
+    width: 120px;
+    transition: border-color 0.2s ease;
+}
+
+.filter-group select:hover,
+.slider-input:hover {
+    border-color: var(--primary);
+    background: var(--filter-hover-bg);
+}
+
+.date-group {
+    min-width: 300px;
+}
+
+.date-inputs {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.date-inputs select {
+    width: 100px;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    padding: 0.5rem;
+    border-top: 1px solid var(--filter-border);
+    /* margin-top: 0.5rem; */
+}
+
+.action-btn {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    background: var(--filter-input-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    background: var(--primary);
+    color: var(--surface);
+    transform: scale(1.05);
+}
+
+.action-btn.primary {
+    background: var(--primary);
+    color: var(--surface);
+}
+
+.action-btn.primary:hover {
+    background: var(--primary-dark);
+}
+
+.filters label,
+.filters select,
+.filters button {
+    /* margin: 10px; */
+    color: var(--text);
+}
+
+.filters .date-filter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+}
+
+.date-filter label {
+    margin-bottom: 5px;
+}
+
+.date-filter select {
+    background-color: var(--surface); /* Surface */
+    border: 1px solid #333;
+    color: var(--text); /* Text on Surface */
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.filters .buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+select,
+button {
+    background-color: var(--surface); /* Surface */
+    border: 1px solid #333;
+    color: var(--text); /* Text on Surface */
+    padding: 10px;
+    border-radius: 5px;
+}
+
+input[type="text"] {
+    background-color: var(--surface); /* Surface */
+    border: 1px solid #333;
+    color: var(--text); /* Text on Surface */
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px;
+}
+
+button:hover {
+    background-color: #3700B3; /* Primary Variant */
+    color: #FFFFFF; /* On Primary */
+}
+
+/* Slider Styles */
+.ui-slider {
+    height: 2px;
+    background: var(--slider-bg);
+    border: none;
+    border-radius: 1px;
+    margin: 10px 0;
+}
+
+.ui-slider .ui-slider-handle {
+    width: 12px;
+    /* height: 12px; */
+    background: var(--slider-handle-bg);
+    border: 2px solid #FFFFFF; /* On Secondary */
+    border-radius: 50%;
+    cursor: pointer;
+    margin-top: -1px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.ui-slider .ui-slider-handle:hover,
+.ui-slider .ui-slider-handle:active {
+    transform: scale(1.2);
+    background: var(--primary-light);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.ui-slider .ui-slider-handle:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(3, 218, 198, 0.3);
+}
+.ui-slider-horizontal {
+    height: .5em !important;
+}
+
+.ui-slider .ui-slider-range {
+    background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+    /* height: 2px; */
+    border-radius: 1px;
+}
+
+#ageRange,
+#ratingRange {
+    font-size: 14px;
+    color: var(--text); 
+    margin-top: 5px;
+    display: inline-block;
+    text-align: center;
+}
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) rgba(30, 30, 30, 0);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+*::-webkit-scrollbar {
+    width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: rgba(30, 30, 30, 0.5);
+    border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: var(--primary);
+    border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary-dark);
+}
+/* Card Styles */
+.card-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    padding: 20px;
+}
+
+.card {
+    background-color: var(--card-bg); 
+    backdrop-filter: blur(5px);
+    border: 1px solid var(--border);
+    color: var(--card-text);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10px;
+    text-align: center;
+    /* box-shadow: 4px 4px 6px rgba(3, 218, 198, 0.5);  */
+    /* border: 0.5px solid #01242088;  */
+    transition: transform 0.3s, box-shadow 0.3s;
+    flex: 1 1 20%;
+    max-width: 20%;
+    box-sizing: border-box;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.6);
+}
+
+.card h2 {
+    color: var(--card-text);
+    margin-bottom: 0.5rem;
+}
+
+.card p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Chart Styles */
+.charts {
+    padding: 0 0 10px 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.chart-container {
+    background-color: var(--chart-container-bg); 
+    backdrop-filter: blur(5px);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 45%;
+    margin: 1%;
+    max-height: 400px; /* Set a max height for the containers */
+    overflow-y: auto; /* Enable vertical scrolling */
+    position: relative;
+    overflow: visible !important;
+    z-index: 1;
+    padding-top: 40px; /* Increased padding to accommodate tooltip */
+    border: 1px solid var(--border);
+    color: var(--text);
+    transition: background-color var(--transition-speed) ease,
+                color var(--transition-speed) ease;
+}
+
+.mchart-container {
+    background-color: var(--surface); /* Surface */
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 95%;
+    margin: 1%;
+}
+
+.chart-container h2 {
+    color: var(--heading-color);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+canvas {
+    /* width: 90% !important; */
+    max-height: 40vh;
+    color: var(--text);
+}
+
+#applyFilter {
+    background-color: var(--primary); /* Secondary */
+    color: var(--background); /* On Secondary */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#applyFilter:hover {
+    background-color: var(--primary-dark); /* Secondary Variant */
+    color: #FFFFFF; /* On Primary */
+}
+
+table, .store-sales-table, #churnedCustomersTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0;
+    background-color: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--table-border);
+}
+
+table th, 
+table td,
+.store-sales-table th,
+.store-sales-table td,
+#churnedCustomersTable th,
+#churnedCustomersTable td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #333;
+}
+
+table th,
+.store-sales-table th,
+#churnedCustomersTable th {
+    background-color: var(--table-header-bg);
+    color: var(--primary);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    font-weight: 600;
+    border-bottom: 2px solid var(--table-border);
+    backdrop-filter: blur(4px);
+}
+
+table tr:nth-child(even),
+.store-sales-table tr:nth-child(even),
+#churnedCustomersTable tr:nth-child(even) {
+    background-color: var(--table-row-even);
+}
+
+table tr:hover,
+.store-sales-table tr:hover,
+#churnedCustomersTable tr:hover {
+    background-color: var(--table-row-hover);
+}
+
+table td,
+.store-sales-table td,
+#churnedCustomersTable td {
+    border-bottom: 1px solid var(--table-border);
+}
+
+.store-sales-table-container {
+    margin-top: 20px;
+    max-height: 400px;
+    overflow-y: hidden;
+    width: 100%;
+    border-radius: 5px;
+    /* background-color: var(--surface); */
+    margin-top: 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) transparent;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pagination-controls,
+#storeSalesPagination,
+#paginationControls {
+    display: none;
+}
+
+.pagination-controls a {
+    padding: 8px 15px;
+    text-decoration: none;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    min-width: 20px;
+    text-align: center;
+    background-color: var(--surface);
+}
+
+.pagination-controls .page-arrow {
+    font-weight: bold;
+    padding: 8px 12px;
+}
+
+.pagination-controls a:hover {
+    background-color: var(--primary);
+    color: var(--surface);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(3, 218, 198, 0.2);
+}
+
+.pagination-controls a.active {
+    background-color: var(--primary);
+    color: var(--surface);
+    font-weight: bold;
+}
+
+.pagination-controls a[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.table-container {
+    width: 45% !important;
+    max-height: 500px !important;
+    overflow: visible !important; /* Allow button to be visible */
+}
+
+.table-container h2 {
+    margin-bottom: 20px;
+    /* color: var(--secondary); */
+}
+
+/* Loader Styles */
+.loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    width: 30vw;
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%, -50%);
+    z-index: 100000;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    /* ...existing loader styles... */
+}
+
+.spinner {
+    border: 8px solid #333;
+    border-radius: 50%;
+    border-top: 8px solid #ff06eeaf;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loader p {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #333;
+}
+
+/* Action Button Styles */
+.action-button {
+    background-color: var(--primary);
+    color: #FFF;
+    
+    border: 1px solid #ff06ee6e;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.action-button:hover {
+    background-color: var(--primary-dark);
+    color: var(--on-primary);
+}
+
+/* Sort Control Styles */
+.sort-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+
+/* Churned Customers Table Styles */
+#paginationControls .page-number,
+#paginationControls .page-arrow {
+    padding: 8px 15px;
+    text-decoration: none;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    min-width: 20px;
+    text-align: center;
+    background-color: var(--surface);
+}
+
+#paginationControls .page-arrow {
+    font-weight: bold;
+    padding: 8px 12px;
+}
+
+#paginationControls a:hover {
+    background-color: var(--primary);
+    color: var(--surface);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(3, 218, 198, 0.2);
+}
+
+#paginationControls a.active {
+    background-color: var(--primary);
+    color: var(--surface);
+    font-weight: bold;
+}
+
+#churnedCustomersTable thead th {
+    position: sticky;
+    top: 0;
+    background-color: var(--surface);
+    z-index: 1;
+    padding: 0.5rem;
+}
+
+#churnedCustomersTable tbody td {
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.chart-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* position: relative; */
+    margin-bottom: 20px; /* Add space below header */
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.help-icon {
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: black;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    position: relative;
+    margin-left: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.help-tooltip {
+    visibility: hidden;
+    background: var(--tooltip-bg);
+    backdrop-filter: blur(4px);
+    color: var(--text);
+    text-align: left;
+    padding: 12px 16px;
+    border-radius: 8px;
+    position: absolute;
+    width: 250px;
+    font-size: 13px;
+    line-height: 1.5;
+    top: -10px;
+    right: 100%;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 999;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.1);
+    transform: translateY(-100%);
+}
+
+.help-tooltip::after {
+    content: '';
+    position: relative;
+    bottom: -6px;
+    /* left: 20px; */
+    width: 12px;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.85);
+    transform: rotate(45deg);
+    border-right: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.help-icon:hover .help-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Ensure Chart.js legend labels are white */
+.chartjs-legend li span,
+.chartjs-legend li,
+.chartjs-legend li span::before {
+    color: #FFF !important;
+}
+
+.table-wrapper {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) transparent;
+    background: var(--surface);
+    border-radius: var(--border-radius);
+}
+
+.full-width-chart {
+    width: 95% !important;
+    max-height: 600px !important;
+}
+
+.full-width-chart canvas {
+    max-height: 550px !important;
+}
+
+/* Updated Slider Styles */
+.filter-group .slider-input {
+    width: 150px;
+    /* padding: 10px 0; */
+    margin: 0 10px;
+}
+
+.range-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 5px;
+    text-align: center;
+    min-width: 60px;
+    background: var(--range-label-bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--range-label-border);
+}
+
+/* Dropdown Select Styles */
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg fill='%2303DAC6' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 30px;
+}
+
+select option {
+    background-color: var(--surface);
+    color: var(--text);
+    padding: 12px;
+    border: none;
+}
+
+select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(3, 218, 198, 0.2);
+}
+
+select option:hover,
+select option:focus,
+select option:active,
+select option:checked {
+    background-color: #2C2C2C;
+    color: var(--primary);
+}
+
+/* For Firefox */
+select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 var(--text);
+}
+
+/* For IE/Edge */
+select::-ms-expand {
+    display: none;
+}
+
+.chart-header-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.chart-period-selector {
+    padding: 0.5rem;
+    border: 1px solid var(--primary-dark);
+    border-radius: 4px;
+    background-color: transparent;
+    color: var(--text);
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.chart-period-selector:hover {
+    border-color: var(--primary);
+}
+
+.chart-period-selector option {
+    background-color: var(--surface);
+}
+
+/* Updated Select Styles - Universal */
+select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(102, 102, 102, 0.511);
+    border-radius: 4px;
+    color: #fff;
+    font-size: 0.9rem;
+    padding: 0.5rem;
+    width: auto;
+    min-width: 120px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg fill='%2303DAC6' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 30px;
+    transition: all 0.2s ease;
+}
+
+select:hover {
+    border-color: var(--primary);
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(3, 218, 198, 0.2);
+}
+
+select option {
+    background-color: var(--surface);
+    color: var(--text);
+    padding: 12px;
+}
+
+select option:hover,
+select option:focus,
+select option:active,
+select option:checked {
+    background-color: rgba(3, 218, 198, 0.2);
+    color: var(--primary);
+}
+
+
+.no-transitions * {
+    transition: none !important;
+}
+
+/* Special handling for chart text colors */
+[data-theme="light"] .chartjs-legend li span,
+[data-theme="light"] .chartjs-legend li,
+[data-theme="light"] .chartjs-legend li span::before {
+    color: var(--text) !important;
+}
+
+/* Update Chart.js specific styles */
+.chartjs-text {
+    fill: var(--text) !important;
+    color: var(--text) !important;
+    transition: fill var(--transition-speed) ease,
+                color var(--transition-speed) ease;
+}
+
+/* Ensure tooltips follow theme */
+.chartjs-tooltip {
+    background: var(--tooltip-bg) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border);
+}
+
+/* Update legend styles */
+.chart-legend {
+    color: var(--text);
+    transition: color var(--transition-speed) ease;
+}
+
+/* Enhanced Chart.js legend styles */
+.chart-container .chartjs-legend {
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+
+.chartjs-legend li {
+    padding: 5px 10px;
+    margin: 2px 0;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+}
+
+.chartjs-legend li:hover {
+    background: var(--filter-hover-bg);
+}
+
+.chartjs-legend li span {
+    color: var(--text) !important;
+    font-size: 12px;
+}
+
+/* Ensure Chart.js text elements follow theme */
+.chart-container canvas,
+.chart-container .chartjs-text,
+.chart-container .chartjs-legend li span,
+.chart-container .chartjs-tooltip {
+    color: var(--text) !important;
+    fill: var(--text) !important;
+}
+
+/* Update Chart.js specific styles for light theme */
+[data-theme="light"] .chartjs-legend li span,
+[data-theme="light"] .chartjs-legend li,
+[data-theme="light"] .chartjs-legend li span::before,
+[data-theme="light"] .chart-container canvas,
+[data-theme="light"] .chart-container .chartjs-text,
+[data-theme="light"] .chartjs-text {
+    color: var(--chart-text-color) !important;
+    fill: var(--chart-text-color) !important;
+}
+
+[data-theme="light"] .chart-legend,
+[data-theme="light"] .chart-container .chartjs-legend li span {
+    color: var(--chart-text-color) !important;
+}
+
+/* Ensure axis labels and tick marks are visible in light theme */
+[data-theme="light"] .chart-container .chartjs-axis-labels text,
+[data-theme="light"] .chart-container .chartjs-tick-marks text {
+    fill: var(--chart-text-color) !important;
+}
